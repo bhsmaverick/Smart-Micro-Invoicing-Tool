@@ -1,0 +1,6 @@
+{
+  "name": "Smart Micro-Invoicing Tool",
+  "description": "A SaaS Micro-Invoicing Tool with User Authentication, Client Management and Invoicing built using Node.js, Express, PostgreSQL and Prisma.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
