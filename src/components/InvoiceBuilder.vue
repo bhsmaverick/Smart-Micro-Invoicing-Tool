@@ -185,10 +185,11 @@ import { useInvoiceStore } from '../stores/invoice';
 import { useI18n } from 'vue-i18n';
 import { TrashIcon, PlusIcon, CopyIcon } from 'lucide-vue-next';
 import { useCurrency } from '../composables/useCurrency';
+import { useAPI } from '../composables/useAPI';
 
-// Simulating API call for generating a link
 const invoiceStore = useInvoiceStore();
 const { t, locale } = useI18n();
+const { post } = useAPI();
 
 const { fetchRates, rates, baseCurrency, targetCurrency, formatAmount } = useCurrency();
 
@@ -208,13 +209,23 @@ const generateLink = async () => {
   isGenerating.value = true;
   generatedLink.value = null;
   try {
-    // Simulate API call for creating Invoice document
-    await new Promise(resolve => setTimeout(resolve, 800));
-    const simulatedInvoiceId = `inv_${Math.floor(Math.random() * 100000)}`;
-    const fullUrl = `${window.location.protocol}//${window.location.host}/proposal/${simulatedInvoiceId}`;
-    generatedLink.value = fullUrl;
+    const payload = {
+      clientName: invoiceStore.clientName,
+      clientEmail: invoiceStore.clientEmail,
+      lineItems: invoiceStore.lineItems,
+      totalAmount: invoiceStore.total,
+      currency: targetCurrency.value
+    };
+    const res = await post<{ id: string }>('/api/invoices', payload);
+    if (res && res.id) {
+      const fullUrl = `${window.location.protocol}//${window.location.host}/proposal/${res.id}`;
+      generatedLink.value = fullUrl;
+    } else {
+      throw new Error('Invalid response from server');
+    }
   } catch (err) {
     console.error("Failed to generate link", err);
+    alert('Failed to generate Link. Please try again.');
   } finally {
     isGenerating.value = false;
   }

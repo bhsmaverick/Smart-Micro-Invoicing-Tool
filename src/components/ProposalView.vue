@@ -147,6 +147,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { CreditCardIcon, CheckCircleIcon } from 'lucide-vue-next';
+import { useAPI } from '../composables/useAPI';
 
 interface LineItem { description: string; quantity: number; price: number; }
 interface InvoiceData {
@@ -161,46 +162,55 @@ const route = useRoute();
 const loading = ref(true);
 const actionLoading = ref(false);
 const invoice = ref<InvoiceData | null>(null);
+const { get, post } = useAPI();
 
 const userCompany = "Freelance Studio";
 const formattedDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-onMounted(() => {
-  // Simulate network fetch using the route ID
-  setTimeout(() => {
-    invoice.value = {
-      clientName: 'Acme Corporation',
-      clientEmail: 'billing@acmecorp.com',
-      status: 'DRAFT',
-      totalAmount: 1450.00,
-      lineItems: [
-        { description: 'Web Application Development', quantity: 1, price: 1200.00 },
-        { description: 'Server Deployment & Setup', quantity: 1, price: 250.00 }
-      ]
-    };
+onMounted(async () => {
+  try {
+    const data = await get<InvoiceData>(`/api/invoices/${route.params.id}`);
+    if (data) {
+      invoice.value = data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch invoice:", error);
+  } finally {
     loading.value = false;
-  }, 600);
+  }
 });
 
 const acceptProposal = async () => {
   if (!invoice.value) return;
   actionLoading.value = true;
   
-  // Simulate API call to update status
-  setTimeout(() => {
-    invoice.value!.status = 'ACCEPTED';
+  try {
+    const data = await post<InvoiceData>(`/api/invoices/${route.params.id}/accept`, {});
+    if (data && data.status) {
+      invoice.value.status = data.status;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  } catch (error) {
+    console.error("Failed to accept proposal:", error);
+    alert("Failed to accept proposal. Please try again.");
+  } finally {
     actionLoading.value = false;
-    // Scroll to top smoothly so they see the success banner
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 800);
+  }
 };
 
 const payNow = async () => {
+  if (!invoice.value) return;
   actionLoading.value = true;
-  // Simulate Stripe redirection
-  setTimeout(() => {
-    alert('Redirecting to Stripe Checkout...');
+  
+  try {
+    const res = await post<{ url: string }>('/api/stripe/create-checkout', { invoiceId: route.params.id });
+    if (res && res.url) {
+      window.location.href = res.url;
+    }
+  } catch (error) {
+    console.error("Failed to initiate checkout:", error);
+    alert("Failed to initiate payment. Please try again.");
     actionLoading.value = false;
-  }, 1000);
+  }
 };
 </script>
