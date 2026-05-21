@@ -6,6 +6,10 @@ import { getStripe } from './stripeController.js';
 /**
  * Handles Stripe webhook events, specifically checkout.session.completed
  * to update the invoice status to PAID.
+ * 
+ * IMPORTANT: This controller relies on receiving the RAW request body to verify the Stripe signature.
+ * Ensure that the route using this controller is configured with `express.raw({ type: 'application/json' })`
+ * middleware *before* any other broad `express.json()` middleware is applied in the server setup.
  */
 export const handleWebhook = async (req: Request, res: Response): Promise<void> => {
   const sig = req.headers['stripe-signature'];
@@ -17,11 +21,11 @@ export const handleWebhook = async (req: Request, res: Response): Promise<void> 
   }
 
   let event: Stripe.Event;
-  let stripe: Stripe;
 
   try {
-    stripe = getStripe();
-    // Verify the webhook signature using the raw request body
+    const stripe = getStripe();
+    // Verify the webhook signature using the raw request body. 
+    // If the body was parsed by express.json(), this would fail because the signature is computed on the raw bytes.
     event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
   } catch (err: any) {
     console.error('[WebhookController] Webhook signature verification failed:', err.message);
@@ -33,7 +37,7 @@ export const handleWebhook = async (req: Request, res: Response): Promise<void> 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
     
-    // Retrieve the invoice ID from the metadata
+    // Extract the invoiceId from metadata (or fallback to client_reference_id)
     const invoiceId = session.metadata?.invoiceId || session.client_reference_id;
 
     if (invoiceId) {

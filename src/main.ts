@@ -1,14 +1,20 @@
-import { createApp } from 'vue';
+import { ViteSSG } from 'vite-ssg';
 import { createPinia } from 'pinia';
 import i18n from './locales/setup';
-import router from './router/index';
+import { routes, setupRouterGuards } from './router/index';
 import App from './App.vue';
 import './index.css';
 
-const app = createApp(App);
+export const createApp = ViteSSG(
+  App,
+  { routes },
+  ({ app, router, isClient }) => {
+    const pinia = createPinia();
+    app.use(pinia);
+    app.use(i18n);
 
-app.use(createPinia());
-app.use(i18n);
-app.use(router);
-
-app.mount('#root');
+    if (isClient) {
+      setupRouterGuards(router);
+    }
+  }
+);

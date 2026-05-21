@@ -20,6 +20,8 @@
             <option value="es">🇪🇸 ES</option>
           </select>
           
+          <button @click="handleLogout" class="text-sm text-gray-600 hover:text-gray-900 font-medium ml-2">Log out</button>
+
           <div class="h-8 w-8 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center overflow-hidden">
             <UserIcon class="w-5 h-5 text-gray-500" />
           </div>
@@ -37,4 +39,14 @@
 <script setup lang="ts">
 import InvoiceBuilder from '../components/InvoiceBuilder.vue';
 import { UserIcon } from 'lucide-vue-next';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+const handleLogout = () => {
+  authStore.logout();
+  router.push('/login');
+};
 </script>
