@@ -14,6 +14,25 @@
           <a href="#how-it-works" class="text-gray-600 hover:text-gray-900 font-medium">How it Works</a>
         </nav>
         <div class="flex items-center gap-4">
+          <select 
+            v-model="locale" 
+            class="text-sm bg-gray-50 border border-gray-300 text-gray-700 rounded-md px-2 py-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          >
+            <option value="en">🇺🇸 EN</option>
+            <option value="uk">🇺🇦 UA</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="pt">🇵🇹 PT</option>
+            <option value="de">🇩🇪 DE</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="pl">🇵🇱 PL</option>
+            <option value="ja">🇯🇵 JA</option>
+            <option value="ar">🇸🇦 AR</option>
+            <option value="tr">🇹🇷 TR</option>
+            <option value="hi">🇮🇳 HI</option>
+            <option value="it">🇮🇹 IT</option>
+            <option value="ko">🇰🇷 KO</option>
+            <option value="id">🇮🇩 ID</option>
+          </select>
           <router-link to="/login" class="text-gray-600 hover:text-gray-900 font-medium transition hidden sm:inline-block">Log in</router-link>
           <router-link to="/register" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-sm">
             Start Free
@@ -211,6 +230,9 @@
 <script setup lang="ts">
 import { FileTextIcon, CreditCardIcon, GlobeIcon } from 'lucide-vue-next';
 import { useHead } from '@unhead/vue';
+import { useI18n } from 'vue-i18n';
+
+const { locale } = useI18n();
 
 useHead({
   title: 'SwiftInvoice - Stop chasing payments, get paid faster',

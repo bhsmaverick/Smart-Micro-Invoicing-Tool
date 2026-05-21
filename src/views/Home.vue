@@ -16,8 +16,19 @@
             class="text-sm bg-gray-50 border border-gray-300 text-gray-700 rounded-md px-2 py-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
           >
             <option value="en">🇺🇸 EN</option>
-            <option value="uk">🇺🇦 UK</option>
+            <option value="uk">🇺🇦 UA</option>
             <option value="es">🇪🇸 ES</option>
+            <option value="pt">🇵🇹 PT</option>
+            <option value="de">🇩🇪 DE</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="pl">🇵🇱 PL</option>
+            <option value="ja">🇯🇵 JA</option>
+            <option value="ar">🇸🇦 AR</option>
+            <option value="tr">🇹🇷 TR</option>
+            <option value="hi">🇮🇳 HI</option>
+            <option value="it">🇮🇹 IT</option>
+            <option value="ko">🇰🇷 KO</option>
+            <option value="id">🇮🇩 ID</option>
           </select>
           
           <button @click="handleLogout" class="text-sm text-gray-600 hover:text-gray-900 font-medium ml-2">Log out</button>

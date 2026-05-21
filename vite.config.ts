@@ -9,7 +9,7 @@ export default defineConfig(() => {
     ssgOptions: {
       script: 'async',
       formatting: 'minify',
-      rootContainerId: 'root',
+      rootContainerId: 'app',
       includedRoutes() {
         return ['/', '/login', '/register'];
       },
