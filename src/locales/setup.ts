@@ -5,6 +5,11 @@ const messages = {
   en: {
     invoice: {
       builder: 'Invoice Builder',
+      clientDetails: 'Client Details',
+      clientName: 'Client Name',
+      clientEmail: 'Client Email',
+      saveAndGenerate: 'Save & Generate Link',
+      generating: 'Generating...',
       addLineItem: 'Add Line Item',
       description: 'Description',
       quantity: 'Quantity',
@@ -19,6 +24,11 @@ const messages = {
   uk: {
     invoice: {
       builder: 'Конструктор рахунків',
+      clientDetails: 'Дані клієнта',
+      clientName: 'Ім\'я клієнта',
+      clientEmail: 'Ел. пошта клієнта',
+      saveAndGenerate: 'Зберегти та згенерувати посилання',
+      generating: 'Генерація...',
       addLineItem: 'Додати позицію',
       description: 'Опис',
       quantity: 'Кількість',

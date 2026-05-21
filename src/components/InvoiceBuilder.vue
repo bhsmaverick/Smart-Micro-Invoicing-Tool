@@ -1,48 +1,77 @@
 <template>
-  <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 max-w-4xl mx-auto mt-8 relative">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-      <h2 class="text-2xl font-bold text-gray-900">{{ t('invoice.builder') }}</h2>
+  <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-4xl mx-auto mt-6 relative">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-gray-100 pb-6">
+      <h2 class="text-2xl font-bold text-gray-900 tracking-tight">{{ t('invoice.builder') }}</h2>
       
       <div class="flex items-center gap-3">
         <!-- Currency Selector -->
         <select 
           v-model="targetCurrency"
-          class="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2"
+          class="bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 outline-none transition"
         >
           <option v-for="currency in availableCurrencies" :key="currency" :value="currency">
             {{ currency }}
           </option>
         </select>
-
-        <button 
-          @click="invoiceStore.addLineItem"
-          class="bg-gray-100 text-gray-700 font-medium px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition"
-        >
-          + {{ t('invoice.addLineItem') }}
-        </button>
       </div>
     </div>
 
+    <!-- Client Details Section -->
+    <div class="mb-10">
+      <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">{{ t('invoice.clientDetails') || 'Client Details' }}</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('invoice.clientName') || 'Client Name' }}</label>
+          <input 
+            type="text" 
+            v-model="invoiceStore.clientName" 
+            class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition"
+            placeholder="e.g. Acme Corp"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('invoice.clientEmail') || 'Client Email' }}</label>
+          <input 
+            type="email" 
+            v-model="invoiceStore.clientEmail" 
+            class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition"
+            placeholder="billing@acme.com"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Line Items Section -->
+    <div class="mb-6 flex justify-between items-end">
+      <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wide">Line Items</h3>
+      <button 
+        @click="invoiceStore.addLineItem"
+        class="text-blue-600 bg-blue-50 hover:bg-blue-100 font-medium px-4 py-2 rounded-lg text-sm transition flex items-center gap-2"
+      >
+        <PlusIcon class="w-4 h-4" /> {{ t('invoice.addLineItem') }}
+      </button>
+    </div>
+
     <!-- Line Items Table -->
-    <div class="overflow-x-auto mb-6">
+    <div class="overflow-x-auto mb-8 border border-gray-100 rounded-xl">
       <table class="w-full text-left text-sm text-gray-600">
-        <thead class="bg-gray-50 text-gray-700">
+        <thead class="bg-gray-50 text-gray-700 border-b border-gray-100">
           <tr>
-            <th class="px-4 py-3 rounded-tl-lg">{{ t('invoice.description') }}</th>
-            <th class="px-4 py-3 w-32">{{ t('invoice.quantity') }}</th>
-            <th class="px-4 py-3 w-40">{{ t('invoice.price') }}</th>
-            <th class="px-4 py-3 w-40">{{ t('invoice.total') }}</th>
-            <th class="px-4 py-3 rounded-tr-lg w-20"></th>
+            <th class="px-5 py-3.5 font-medium">{{ t('invoice.description') }}</th>
+            <th class="px-5 py-3.5 font-medium w-32">{{ t('invoice.quantity') }}</th>
+            <th class="px-5 py-3.5 font-medium w-40">{{ t('invoice.price') }}</th>
+            <th class="px-5 py-3.5 font-medium w-40">{{ t('invoice.total') }}</th>
+            <th class="px-5 py-3.5 w-16"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in invoiceStore.lineItems" :key="item.id" class="border-b border-gray-100 last:border-0 hover:bg-gray-50/50">
+          <tr v-for="item in invoiceStore.lineItems" :key="item.id" class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition">
             <td class="px-4 py-3">
               <input 
                 type="text" 
                 v-model="item.description" 
                 :placeholder="t('invoice.description')"
-                class="w-full bg-transparent border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                class="w-full bg-transparent border border-transparent focus:bg-white focus:border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition" 
               />
             </td>
             <td class="px-4 py-3">
@@ -50,84 +79,102 @@
                 type="number" 
                 v-model.number="item.quantity" 
                 min="1"
-                class="w-full p-1 bg-transparent border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                class="w-full bg-transparent border border-transparent focus:bg-white focus:border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500/20 outline-none transition" 
               />
             </td>
             <td class="px-4 py-3">
-              <div class="flex items-center gap-1">
-                <span class="text-gray-500 text-xs text-nowrap">{{ baseCurrency }}</span>
+              <div class="flex items-center gap-1 bg-transparent focus-within:bg-white border-transparent focus-within:border-gray-300 border focus-within:ring-2 focus-within:ring-blue-500/20 rounded-md p-2 transition">
+                <span class="text-gray-500 text-xs text-nowrap font-medium">{{ baseCurrency }}</span>
                 <input 
                   type="number" 
                   v-model.number="item.price" 
                   min="0" step="0.01"
-                  class="w-full p-1 bg-transparent border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 outline-none text-right" 
+                  class="w-full bg-transparent outline-none text-right" 
                   placeholder="0.00"
                 />
               </div>
             </td>
-            <td class="px-4 py-3 font-mono font-medium text-gray-900">
+            <td class="px-5 py-3 font-mono font-medium text-gray-900">
               {{ formatAmount(item.quantity * item.price, locale) }}
             </td>
             <td class="px-4 py-3 text-right">
               <button 
                 @click="invoiceStore.removeLineItem(item.id)"
-                class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition"
+                class="text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition"
                 :title="t('invoice.remove')"
               >
-                <TrashIcon class="w-5 h-5" />
+                <TrashIcon class="w-4 h-4" />
               </button>
             </td>
           </tr>
           
           <tr v-if="invoiceStore.lineItems.length === 0">
-            <td colspan="5" class="py-8 text-center text-gray-400">
-              No items added yet. Click "Add Line Item" to start.
+            <td colspan="5" class="py-12 text-center text-gray-400">
+              No items added yet. Click "Add Line Item" to start building your invoice.
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Summary Box -->
-    <div class="w-full max-w-sm ml-auto bg-gray-50 rounded-lg p-5">
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-sm font-medium text-gray-600">{{ t('invoice.subtotal') }}:</span>
-        <span class="text-gray-900 font-medium font-mono">{{ formatAmount(invoiceStore.subtotal, locale) }}</span>
+    <!-- Bottom Actions / Summary -->
+    <div class="flex flex-col-reverse md:flex-row justify-between items-end gap-8">
+      
+      <!-- Generated Link -->
+      <div v-if="generatedLink" class="w-full md:w-1/2 p-4 bg-green-50 rounded-xl border border-green-100 flex items-center justify-between">
+        <div class="truncate mr-4">
+          <p class="text-xs text-green-800 font-semibold uppercase mb-1">Shareable Link</p>
+          <a :href="generatedLink" target="_blank" class="text-sm font-medium text-green-700 hover:underline truncate inline-block w-full">{{ generatedLink }}</a>
+        </div>
+        <button @click="copyLink" class="p-2 bg-white rounded-lg text-green-700 shadow-sm border border-green-200 hover:bg-green-100 hover:shadow transition">
+          <CopyIcon class="w-4 h-4"/>
+        </button>
       </div>
-      
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-sm font-medium text-gray-600">{{ t('invoice.tax') }} (%):</span>
-        <input 
-          type="number" 
-          v-model.number="invoiceStore.taxRate"
-          class="w-20 text-right p-1 border border-gray-300 rounded text-sm focus:ring-blue-500 outline-none" 
-        />
+      <div v-else class="w-full md:w-1/2 text-sm text-gray-500 font-medium hidden md:block">
+        Draft your invoice securely. Link is generated upon saving.
       </div>
-      
-      <div class="flex justify-between items-center mb-4">
-        <span class="text-sm font-medium text-gray-600">{{ t('invoice.discount') }} (Base):</span>
-        <input 
-          type="number" 
-          v-model.number="invoiceStore.discount"
-          class="w-32 text-right p-1 border border-gray-300 rounded text-sm focus:ring-blue-500 outline-none" 
-        />
+
+      <!-- Summary Box -->
+      <div class="w-full max-w-sm bg-gray-50 rounded-xl p-6 border border-gray-100 shadow-sm">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-sm font-medium text-gray-600">{{ t('invoice.subtotal') }}:</span>
+          <span class="text-gray-900 font-medium font-mono">{{ formatAmount(invoiceStore.subtotal, locale) }}</span>
+        </div>
+        
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-sm font-medium text-gray-600">{{ t('invoice.tax') }} (%):</span>
+          <input 
+            type="number" 
+            v-model.number="invoiceStore.taxRate"
+            class="w-24 text-right p-1.5 focus:bg-white border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition" 
+          />
+        </div>
+        
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-sm font-medium text-gray-600">{{ t('invoice.discount') }} (Base):</span>
+          <input 
+            type="number" 
+            v-model.number="invoiceStore.discount"
+            class="w-24 text-right p-1.5 focus:bg-white border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition" 
+          />
+        </div>
+        
+        <hr class="border-gray-200 mb-4" />
+        
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-base font-bold text-gray-900">{{ t('invoice.total') }}:</span>
+          <span class="text-xl font-bold text-blue-600 font-mono">{{ formatAmount(invoiceStore.total, locale) }}</span>
+        </div>
+        
+        <button 
+          @click="generateLink"
+          :disabled="isGenerating || invoiceStore.total <= 0"
+          class="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          <span v-if="!isGenerating">{{ t('invoice.saveAndGenerate') || 'Save & Generate Link' }}</span>
+          <span v-else>{{ t('invoice.generating') || 'Generating...' }}</span>
+        </button>
       </div>
-      
-      <hr class="border-gray-200 mb-4" />
-      
-      <div class="flex justify-between items-center mb-6">
-        <span class="text-base font-bold text-gray-900">{{ t('invoice.total') }}:</span>
-        <span class="text-xl font-bold text-blue-600 font-mono">{{ formatAmount(invoiceStore.total, locale) }}</span>
-      </div>
-      
-      <button 
-        @click="createCheckout"
-        :disabled="isCheckingOut || invoiceStore.total <= 0"
-        class="w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-      >
-        <span v-if="!isCheckingOut">Pay Ext. (Stripe Checkout)</span>
-        <span v-else>Processing...</span>
-      </button>
     </div>
   </div>
 </template>
@@ -136,19 +183,19 @@
 import { ref, onMounted, computed } from 'vue';
 import { useInvoiceStore } from '../stores/invoice';
 import { useI18n } from 'vue-i18n';
-import { TrashIcon } from 'lucide-vue-next';
+import { TrashIcon, PlusIcon, CopyIcon } from 'lucide-vue-next';
 import { useCurrency } from '../composables/useCurrency';
-import { useAPI } from '../composables/useAPI';
 
+// Simulating API call for generating a link
 const invoiceStore = useInvoiceStore();
 const { t, locale } = useI18n();
-const { post } = useAPI();
 
 const { fetchRates, rates, baseCurrency, targetCurrency, formatAmount } = useCurrency();
 
 const availableCurrencies = computed(() => Object.keys(rates.value).filter(val => ['USD', 'EUR', 'GBP', 'JPY', 'CAD'].includes(val)));
 
-const isCheckingOut = ref(false);
+const isGenerating = ref(false);
+const generatedLink = ref<string | null>(null);
 
 onMounted(() => {
   fetchRates('USD');
@@ -157,24 +204,25 @@ onMounted(() => {
   }
 });
 
-const createCheckout = async () => {
-  isCheckingOut.value = true;
+const generateLink = async () => {
+  isGenerating.value = true;
+  generatedLink.value = null;
   try {
-    // Note: Normally we would save the invoice to the DB first, then ask for a checkout session.
-    // For this demonstration, we are simulating reaching an API endpoint.
-    const res = await post<{ url: string }>('/api/stripe/create-checkout-session', {
-      invoiceId: 'dummy-invoice-id', // Simulated, should be a real ID
-      currency: targetCurrency.value
-    });
-    
-    if (res && res.url) {
-      window.location.href = res.url;
-    }
+    // Simulate API call for creating Invoice document
+    await new Promise(resolve => setTimeout(resolve, 800));
+    const simulatedInvoiceId = `inv_${Math.floor(Math.random() * 100000)}`;
+    const fullUrl = `${window.location.protocol}//${window.location.host}/proposal/${simulatedInvoiceId}`;
+    generatedLink.value = fullUrl;
   } catch (err) {
-    console.error("Checkout failed", err);
-    alert('Checkout failed. Ensure you are authenticated and have valid tokens.');
+    console.error("Failed to generate link", err);
   } finally {
-    isCheckingOut.value = false;
+    isGenerating.value = false;
+  }
+};
+
+const copyLink = () => {
+  if (generatedLink.value) {
+    navigator.clipboard.writeText(generatedLink.value);
   }
 };
 </script>

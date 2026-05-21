@@ -12,6 +12,8 @@ export const useInvoiceStore = defineStore('invoice', () => {
   const lineItems = ref<LineItem[]>([]);
   const taxRate = ref<number>(0);
   const discount = ref<number>(0);
+  const clientName = ref<string>('');
+  const clientEmail = ref<string>('');
   const clientId = ref<string>('');
 
   const addLineItem = () => {
@@ -50,6 +52,8 @@ export const useInvoiceStore = defineStore('invoice', () => {
     lineItems,
     taxRate,
     discount,
+    clientName,
+    clientEmail,
     clientId,
     addLineItem,
     removeLineItem,
